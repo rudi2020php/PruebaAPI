@@ -60,3 +60,8 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
+Project****
+
+users should be able to create, update, and delete meetings. Furthermore, other users should be able to register and unregister for any created meetings. Lastly, is should be possible to retrieve at list of all or data about an indivivial meeting
