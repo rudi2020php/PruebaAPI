@@ -15,7 +15,39 @@ class RegitrationController extends Controller
      */
     public function store(Request $request)
     {
-        return "it's works!!!  IN STORE, registration";
+        $this->validate($request,[
+            'meeting_id'=> 'required',
+            'user_id'=> 'required'
+        ]);
+
+        $meeting_id = $request->input('meeting_id');
+        $user_id = $request->input('user_id');
+
+        $metting = [
+            'title' => 'Title',
+            'description' => 'Description',
+            'time' => 'Time',
+            'view_meeting' => [
+                'href' => 'api/v1/meeting/1',
+                'method' => 'GET'
+            ]
+        ];
+
+        $user = [
+            'name' => 'Name'
+        ];
+
+        $response = [
+            'msg' => 'User registered for meeting',
+            'meeting' => $meeting,
+            'user' => $user,
+            'unregistered' => [
+                'href' => 'api/v1/registration/1',
+                'method' => 'DELETE'
+            ]
+        ];
+
+        return response()->json($response, 201);
     }
 
     /**
@@ -26,6 +58,31 @@ class RegitrationController extends Controller
      */
     public function destroy($id)
     {
-        return "it's works!!! -- IN DESTROY, registration";
+        $meeting = [
+            'title' => 'Title',
+            'description' => 'Description',
+            'time' => 'Time',
+            'view_meeting' => [
+                'href' => 'api/v1/meeting/1',
+                'method'=> 'GET'
+            ]
+        ];
+
+        $user =[
+            'name'=> 'Name'
+        ];
+
+        $response =[
+            'msg' => 'Usr unregistered for meeting',
+            'meeting' => $meeting,
+            'user' => $user,
+            'registered' =>[
+                'href' => 'api/v1/registration',
+                'method' => 'POST',
+                'params' => 'user_id, meeting_id'
+            ]
+        ];
+
+        return responsr()->json($response, 200);
     }
 }
