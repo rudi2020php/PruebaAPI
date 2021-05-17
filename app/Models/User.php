@@ -32,6 +32,9 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function meetings(){
+        return $this->belongsToMany('App\Models\Meeting');
+    }
     /**
      * The attributes that should be cast to native types.
      *
@@ -41,3 +44,4 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 }
+ 

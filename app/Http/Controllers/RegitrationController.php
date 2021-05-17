@@ -23,7 +23,7 @@ class RegitrationController extends Controller
         $meeting_id = $request->input('meeting_id');
         $user_id = $request->input('user_id');
 
-        $metting = [
+        $meeting = [
             'title' => 'Title',
             'description' => 'Description',
             'time' => 'Time',
@@ -83,6 +83,6 @@ class RegitrationController extends Controller
             ]
         ];
 
-        return responsr()->json($response, 200);
+        return response()->json($response, 200);
     }
 }

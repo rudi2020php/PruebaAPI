@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Validator;
+use App\Models\Meeting;
+use Carbon\Carbon;
 
 class MeetingController extends Controller
 {
 
-    public function __construct(){
+    public function __construct()
+    {
         //this->middleware('name');
     }
     /**
@@ -18,22 +21,17 @@ class MeetingController extends Controller
      */
     public function index()
     {
-        $meeting = [
-            'title' => 'Title',
-            'description' => 'Description',
-            'time' => 'Time',
-            'user_id' => 'user_id',
-            'view_meeting' => [
-                'href' => 'api/v1/meeting/1',
-                'method'=> 'GET'
-            ]
-        ];
+        $meetings = Meeting::all();
+        foreach ($meetings as $meeting) {
+            $meeting->view_meeting = [
+                'href' => 'api/v1/meeting/' . $meeting->id,
+                'method' => 'GET'
+            ];
+        }
 
         $response = [
             'msg' => 'list of all meetings ',
-            'meeting' => [
-                $meeting, $meeting, $meeting
-            ]
+            'meeting' => $meetings
         ];
 
         return response()->json($response, 200);
@@ -47,41 +45,41 @@ class MeetingController extends Controller
      */
     public function store(Request $request)
     {
-       $veri = array(
-                'title' => 'required',
-                'description' => 'required',
-                'time' => 'required|date_format:YmdHie',
-                'user_id' => 'required'
-            );
+        $veri = array(
+            'title' => 'required',
+            'description' => 'required',
+            'time' => 'required|date_format:YmdHie',
+            'user_id' => 'required'
+        );
 
         $validador = Validator::make($request->all(), $veri);
 
-        if($validador->fails()){
+        if ($validador->fails()) {
             return $validador->errors();
-        }else{
-       
-        $title = $request->input('title');
-        $description = $request->input('description');
-        $time= $request->input('time');
-        $user_id= $request->input('user_id');
-        
-        $meeting = [
-            'title' => $title,
-            'description' => $description,
-            'time' => $time,
-            'user_id' => $user_id,
-            'view_meeting' => [
-                'href' => 'api/v1/meeting/1',
-                'method'=> 'GET'
-            ]
-        ];
+        } else {
 
-        $response = [
-            'msg' => 'Meeting created',
-            'meeting' => $meeting
-        ];
+            $title = $request->input('title');
+            $description = $request->input('description');
+            $time = $request->input('time');
+            $user_id = $request->input('user_id');
 
-        return response()->json($response, 201);
+            $meeting = new Meeting([
+                'time' => Carbon::createFromFormat('YmdHie', $time),
+                'title' => $title,
+                'description' => $description
+            ]);
+            if ($meeting->save()) {
+                $meeting->users()->attach($user_id);
+                $meeting->view_meeting = [
+                    'href' => 'api/v1/meeting/' . $meeting->id,
+                    'method' => 'GET'
+                ];
+                $message = [
+                    'msg' => 'Meeting created',
+                    'meeting' => $meeting
+                ];
+                return response()->json($message, 201);
+            };
         }
     }
 
@@ -93,15 +91,10 @@ class MeetingController extends Controller
      */
     public function show($id)
     {
-        $meeting = [
-            'title' => 'Title',
-            'description' => 'Description',
-            'time' => 'Time',
-            'user_id' => 'user Id',
-            'view_meeting' => [
-                'href' => 'api/v1/meeting',
-                'method' => 'GET'
-            ]
+        $meeting = Meeting::with('users')->where('id', $id)->firstOrFail();
+        $meeting->vie_meeting = [
+            'href' => 'api/v1/meeting',
+            'method' => 'GET'
         ];
 
         $response = [
@@ -122,7 +115,7 @@ class MeetingController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'title'=> 'required',
+            'title' => 'required',
             'description' => 'required',
             'time' => 'required|date_format:YmdHie',
             'user_id' => 'required'
@@ -130,8 +123,8 @@ class MeetingController extends Controller
 
         $title = $request->input('title');
         $description = $request->input('Description');
-        $time= $request->input('time');
-        $user_id= $request->input('user_id');
+        $time = $request->input('time');
+        $user_id = $request->input('user_id');
 
         $meeting = [
             'title' => $title,
@@ -139,18 +132,17 @@ class MeetingController extends Controller
             'time' => $time,
             'user_id' => $user_id,
             'view_meeting' => [
-                'href'=> 'api/v1/meeting/1',
+                'href' => 'api/v1/meeting/1',
                 'method' => 'GET'
             ]
         ];
 
-        $response =[
+        $response = [
             'msg' => 'Meeting update',
             'meeting' => $meeting
         ];
 
         return response()->json($response, 200);
-       
     }
 
     /**
