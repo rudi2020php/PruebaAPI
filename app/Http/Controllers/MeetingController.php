@@ -32,7 +32,7 @@ class MeetingController extends Controller
         $response = [
             'msg' => 'list of all meetings ',
             'meeting' => [
-                $meeting, $meeting
+                $meeting, $meeting, $meeting
             ]
         ];
 
