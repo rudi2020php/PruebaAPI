@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Models\Meeting;
 use Carbon\Carbon;
+use App\Models\User;
 
 class MeetingController extends Controller
 {
@@ -122,27 +123,37 @@ class MeetingController extends Controller
         ]);
 
         $title = $request->input('title');
-        $description = $request->input('Description');
+        $description = $request->input('description');
         $time = $request->input('time');
         $user_id = $request->input('user_id');
 
-        $meeting = [
-            'title' => $title,
-            'description' => $description,
-            'time' => $time,
-            'user_id' => $user_id,
-            'view_meeting' => [
-                'href' => 'api/v1/meeting/1',
+        $meeting = Meeting::with('users')->findOrFail($id);
+     
+        if($meeting->users()->where('users.id', $user_id)->first()){
+           // $user = User::findOrFail($id)-get();
+           return response()->json(['msg' => 'user not registered for meeting, update not successfull'], 401);
+           //return response()->json([$meeting, 'msg' => 'no actualizado'], 200);
+        };
+      
+        $meeting->time = Carbon::createFromFormat('Ymdhie', $time);
+        $meeting->title = $title;
+        $meeting->description = $description;
+        if($meeting->update()){
+            $meeting->users()->attach($user_id);
+            $meeting->view_meeting = [
+                'href' => 'api/v1/meeting'.$meeting->id,
                 'method' => 'GET'
-            ]
-        ];
+            ];
+            $response = [
+                'msg' => 'Meeting update',
+                'meeting' => $meeting,
 
-        $response = [
-            'msg' => 'Meeting update',
-            'meeting' => $meeting
-        ];
+            ];
+    
+            return response()->json($response, 200);
+        };
 
-        return response()->json($response, 200);
+        return response()->json(['msg' => 'Error during UPDATING'], 404);
     }
 
     /**

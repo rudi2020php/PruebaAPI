@@ -13,7 +13,7 @@ class CreatMeetingUserTable extends Migration
      */
     public function up()
     {
-        Schema::create('meetings_user', function (Blueprint $table) {
+        Schema::create('meeting_user', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->integer('user_id');
@@ -28,6 +28,6 @@ class CreatMeetingUserTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('meetings_user');
+        Schema::dropIfExists('meeting_user');
     }
 }
