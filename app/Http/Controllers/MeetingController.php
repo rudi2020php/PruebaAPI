@@ -70,6 +70,7 @@ class MeetingController extends Controller
                 'description' => $description
             ]);
             if ($meeting->save()) {
+                //aquí debe de iniciar el if para verificar el usuario a insertar
                 $meeting->users()->attach($user_id);
                 $meeting->view_meeting = [
                     'href' => 'api/v1/meeting/' . $meeting->id,
@@ -93,7 +94,7 @@ class MeetingController extends Controller
     public function show($id)
     {
         $meeting = Meeting::with('users')->where('id', $id)->firstOrFail();
-        $meeting->vie_meeting = [
+        $meeting->view_meeting = [
             'href' => 'api/v1/meeting',
             'method' => 'GET'
         ];
@@ -128,31 +129,31 @@ class MeetingController extends Controller
         $user_id = $request->input('user_id');
 
         $meeting = Meeting::with('users')->findOrFail($id);
-     
-        if($meeting->users()->where('users.id', $user_id)->first()){
-           // $user = User::findOrFail($id)-get();
-           return response()->json(['msg' => 'user not registered for meeting, update not successfull'], 401);
+       
+            $usr =$meeting->users()->where('users.id', $user_id)->first();
+            //return response()->json($usr);
+        if(!$usr){
+           $user = User::findOrFail($user_id);
+          //$usuario = $meeting->users();
+           return response()->json(['msg' => 'user not registered for meeting, update not successful',$user], 401);
            //return response()->json([$meeting, 'msg' => 'no actualizado'], 200);
         };
-      
+     
         $meeting->time = Carbon::createFromFormat('Ymdhie', $time);
         $meeting->title = $title;
         $meeting->description = $description;
         if($meeting->update()){
-            $meeting->users()->attach($user_id);
+            //$meeting->users()->attach($user_id);
             $meeting->view_meeting = [
-                'href' => 'api/v1/meeting'.$meeting->id,
+                'href' => 'api/v1/meeting/'.$meeting->id,
                 'method' => 'GET'
             ];
             $response = [
                 'msg' => 'Meeting update',
                 'meeting' => $meeting,
-
             ];
-    
-            return response()->json($response, 200);
-        };
-
+                return response()->json($response, 200);
+        };      
         return response()->json(['msg' => 'Error during UPDATING'], 404);
     }
 
