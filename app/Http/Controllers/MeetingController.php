@@ -165,8 +165,17 @@ class MeetingController extends Controller
      */
     public function destroy($id)
     {
+        $meeting = Meeting::findOrFail($id);
+        $users = $meeting->users;
+        $meeting->users()->detach();
+        if(!$meeting ->delete()){
+            foreach($users as $user){
+                $meeting->users()->attach($user);
+            }
+            return response()->json(['msg' => 'delete failed'], 404);
+        };
         $response = [
-            'msg' => 'Meeting delete',
+            'msg' => 'Meeting deleted',
             'created' => [
                 'href' => 'api/v1/meeting',
                 'method' => 'GET',
