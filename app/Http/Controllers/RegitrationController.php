@@ -45,7 +45,7 @@ class RegitrationController extends Controller
             'meeting' => $meeting,
             'user' => $user,
             'unregistered' => [
-                'href' => 'api/v1/regitration/'. $meeting_id,
+                'href' => 'api/v1/registration/'. $meeting_id,
                 'method' => 'DELETE'
             ]
         ];
@@ -69,7 +69,7 @@ class RegitrationController extends Controller
             'meeting' => $meeting,
             'user' => 'tbdd',
             'registered' =>[
-                'href' => 'api/v1/meeting/regitration',
+                'href' => 'api/v1/meeting/regitratison',
                 'method' => 'POST',
                 'params' => 'user_id, meeting_id'
             ]
