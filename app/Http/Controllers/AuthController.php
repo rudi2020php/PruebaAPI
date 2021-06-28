@@ -48,8 +48,23 @@ class AuthController extends Controller
 
     public function signin(Request $request){
 
+        $this->validate($request, [
+         'email' => 'required|email',
+         'password' => 'required'
+        ]);
+
         $email = $request->input('email');
         $password = $request->input('password');
+        $user = [
+            'name' => 'Name',
+            'email' => $email,
+            'password' => $password
+        ];
+
+        $respnse = [
+            'msg' => 'User signed in',
+            'user' => $user
+        ];
         return "it's works!!!-- IN SIGNIN, Auth";
     }
 }

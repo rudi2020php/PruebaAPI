@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Validator;
 use App\Models\Meeting;
 use Carbon\Carbon;
+use App\Models\User;
 
 class MeetingController extends Controller
 {
@@ -70,6 +71,7 @@ class MeetingController extends Controller
             ]);
 
             if ($meeting->save()) {
+                //aquí debe de iniciar el if para verificar el usuario a insertar
                 $meeting->users()->attach($user_id);
                 $meeting->view_meeting = [
                     'href' => 'api/v1/meeting/' . $meeting->id,
@@ -93,8 +95,13 @@ class MeetingController extends Controller
     public function show($id)
     {
         $meeting = Meeting::with('users')->where('id', $id)->firstOrFail();
+<<<<<<< HEAD
         $meeting->vie_meeting = [
             'href' => 'api/v1/meeting/'. $id,
+=======
+        $meeting->view_meeting = [
+            'href' => 'api/v1/meeting',
+>>>>>>> 26c23d8ab8de18b07d6622cc1cf63ccf86fe9499
             'method' => 'GET'
         ];
 
@@ -123,27 +130,37 @@ class MeetingController extends Controller
         ]);
 
         $title = $request->input('title');
-        $description = $request->input('Description');
+        $description = $request->input('description');
         $time = $request->input('time');
         $user_id = $request->input('user_id');
 
-        $meeting = [
-            'title' => $title,
-            'description' => $description,
-            'time' => $time,
-            'user_id' => $user_id,
-            'view_meeting' => [
-                'href' => 'api/v1/meeting/1',
+        $meeting = Meeting::with('users')->findOrFail($id);
+       
+            $usr =$meeting->users()->where('users.id', $user_id)->first();
+            //return response()->json($usr);
+        if(!$usr){
+           $user = User::findOrFail($user_id);
+          //$usuario = $meeting->users();
+           return response()->json(['msg' => 'user not registered for meeting, update not successful',$user], 401);
+           //return response()->json([$meeting, 'msg' => 'no actualizado'], 200);
+        };
+     
+        $meeting->time = Carbon::createFromFormat('Ymdhie', $time);
+        $meeting->title = $title;
+        $meeting->description = $description;
+        if($meeting->update()){
+            //$meeting->users()->attach($user_id);
+            $meeting->view_meeting = [
+                'href' => 'api/v1/meeting/'.$meeting->id,
                 'method' => 'GET'
-            ]
-        ];
-
-        $response = [
-            'msg' => 'Meeting update',
-            'meeting' => $meeting
-        ];
-
-        return response()->json($response, 200);
+            ];
+            $response = [
+                'msg' => 'Meeting update',
+                'meeting' => $meeting,
+            ];
+                return response()->json($response, 200);
+        };      
+        return response()->json(['msg' => 'Error during UPDATING'], 404);
     }
 
     /**
@@ -154,8 +171,17 @@ class MeetingController extends Controller
      */
     public function destroy($id)
     {
+        $meeting = Meeting::findOrFail($id);
+        $users = $meeting->users;
+        $meeting->users()->detach();
+        if(!$meeting ->delete()){
+            foreach($users as $user){
+                $meeting->users()->attach($user);
+            }
+            return response()->json(['msg' => 'delete failed'], 404);
+        };
         $response = [
-            'msg' => 'Meeting delete',
+            'msg' => 'Meeting deleted',
             'created' => [
                 'href' => 'api/v1/meeting',
                 'method' => 'GET',
