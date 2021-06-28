@@ -9,9 +9,9 @@ class Meeting extends Model
 {
     use HasFactory;
 
-    protected $filable = ['time', 'title', 'description'];
+    protected $fillable = ['time', 'title', 'description'];
 
     public function users(){
-        return $this->belongsToMany('App\Models\user');
+        return $this->belongsToMany('App\Models\User');
     }
 }

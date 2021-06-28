@@ -68,6 +68,7 @@ class MeetingController extends Controller
                 'title' => $title,
                 'description' => $description
             ]);
+
             if ($meeting->save()) {
                 $meeting->users()->attach($user_id);
                 $meeting->view_meeting = [
@@ -93,7 +94,7 @@ class MeetingController extends Controller
     {
         $meeting = Meeting::with('users')->where('id', $id)->firstOrFail();
         $meeting->vie_meeting = [
-            'href' => 'api/v1/meeting',
+            'href' => 'api/v1/meeting/'. $id,
             'method' => 'GET'
         ];
 
