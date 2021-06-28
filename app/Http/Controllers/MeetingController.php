@@ -8,6 +8,9 @@ use App\Models\Meeting;
 use Carbon\Carbon;
 use App\Models\User;
 
+use function PHPUnit\Framework\isJson;
+use function PHPUnit\Framework\isNull;
+
 class MeetingController extends Controller
 {
 
@@ -23,6 +26,7 @@ class MeetingController extends Controller
     public function index()
     {
         $meetings = Meeting::all();
+
         foreach ($meetings as $meeting) {
             $meeting->view_meeting = [
                 'href' => 'api/v1/meeting/' . $meeting->id,
@@ -95,13 +99,8 @@ class MeetingController extends Controller
     public function show($id)
     {
         $meeting = Meeting::with('users')->where('id', $id)->firstOrFail();
-<<<<<<< HEAD
         $meeting->vie_meeting = [
             'href' => 'api/v1/meeting/'. $id,
-=======
-        $meeting->view_meeting = [
-            'href' => 'api/v1/meeting',
->>>>>>> 26c23d8ab8de18b07d6622cc1cf63ccf86fe9499
             'method' => 'GET'
         ];
 
