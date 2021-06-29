@@ -64,6 +64,11 @@ class MeetingController extends Controller
             $time = $request->input('time');
             $user_id = $request->input('user_id');
 
+            $usr = User::find($user_id);
+            if($usr === null){
+                return response()->json(['msg' => 'Usuario no registrado en la BDD', 'usuario'=>$usr], 200);
+            };
+
             $meeting = new Meeting([
                 'time' => Carbon::createFromFormat('YmdHie', $time),
                 'title' => $title,
