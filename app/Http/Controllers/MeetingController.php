@@ -69,6 +69,11 @@ class MeetingController extends Controller
             $time = $request->input('time');
             $user_id = $request->input('user_id');
 
+            $usr = User::find($user_id);
+            if($usr === null){
+                return response()->json(['msg' => 'Usuario no registrado en la BDD', 'usuario'=>$usr], 200);
+            };
+
             $meeting = new Meeting([
                 'time' => Carbon::createFromFormat('YmdHie', $time),
                 'title' => $title,
@@ -101,10 +106,13 @@ class MeetingController extends Controller
     {
         try{
         $meeting = Meeting::with('users')->where('id', $id)->firstOrFail();
+<<<<<<< HEAD
         } catch ( \Exception Exception){
             return response()->json(['msj' => 'No Encontrado'], 200);
         }
 
+=======
+>>>>>>> 80456533f83177620bdd26a429b3389300ea1019
         $meeting->vie_meeting = [
             'href' => 'api/v1/meeting/'. $id,
             'method' => 'GET'
