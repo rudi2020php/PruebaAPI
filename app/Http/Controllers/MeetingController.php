@@ -7,6 +7,7 @@ use Validator;
 use App\Models\Meeting;
 use Carbon\Carbon;
 use App\Models\User;
+use Exception;
 
 use function PHPUnit\Framework\isJson;
 use function PHPUnit\Framework\isNull;
@@ -98,7 +99,12 @@ class MeetingController extends Controller
      */
     public function show($id)
     {
+        try{
         $meeting = Meeting::with('users')->where('id', $id)->firstOrFail();
+        } catch ( \Exception Exception){
+            return response()->json(['msj' => 'No Encontrado'], 200);
+        }
+
         $meeting->vie_meeting = [
             'href' => 'api/v1/meeting/'. $id,
             'method' => 'GET'
@@ -140,7 +146,7 @@ class MeetingController extends Controller
         if(!$usr){
            $user = User::findOrFail($user_id);
           //$usuario = $meeting->users();
-           return response()->json(['msg' => 'user not registered for meeting, update not successful',$user], 401);
+           return response()->json(['msg' => 'user not registered for meeting, update not successful', $user], 401);
            //return response()->json([$meeting, 'msg' => 'no actualizado'], 200);
         };
      
